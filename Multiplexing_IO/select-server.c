@@ -65,7 +65,7 @@ int main(int argc, char **argv) {
         exit(1);
     }
 
-    while (1) {
+    while (true) {
         printf("\n----等待新的连接到来开始新一轮聊天……\n");
 
         len = sizeof(struct sockaddr);
@@ -79,7 +79,7 @@ int main(int argc, char **argv) {
         // 开始处理每个新连接上的数据收发
         printf("\n准备就绪，可以开始聊天了……直接输入消息回车即可发信息给对方\n");
 
-        while (1) {
+        while (true) {
             // 把集合清空
             FD_ZERO(&rfds);
 
@@ -100,17 +100,17 @@ int main(int argc, char **argv) {
             // 开始等待
             retval = select(maxfd + 1, &rfds, NULL, NULL, &tv);
 
-            if (retval == -1) {
+            if (retval == -1) {         // select调用出错
                 printf("将退出，select出错！ %s", strerror(errno));
                 break;
-            } else if (retval == 0) {
+            } else if (retval == 0) {   // select调用超时
                 printf("没有任何消息到来，用户也没有按键，继续等待……\n");
                 continue;
             } else {
                 // 判断当前IO是否是stdin
                 if (FD_ISSET(0, &rfds)) {    // 用户按键了，则读取用户输入的内容发送出去
                     bzero(buf, MAXBUF + 1);
-                    fgets(buf, MAXBUF, stdin);
+                    fgets(buf, MAXBUF, stdin);  // 获取用户的输入内容
                     if (!strncasecmp(buf, "quit", 4)) {
                         printf("自己请求终止聊天！\n");
                         break;
@@ -118,7 +118,7 @@ int main(int argc, char **argv) {
 
                     len = send(new_fd, buf, strlen(buf) - 1, 0);
 
-                    if (len > 0)
+                    if ((ssize_t)len > 0)
                         printf("消息:%s\t发送成功，共发送了%d个字节！\n", buf, len);
                     else {
                         printf("消息'%s'发送失败！错误代码是%d，错误信息是'%s'\n", buf, errno, strerror(errno));
@@ -132,13 +132,13 @@ int main(int argc, char **argv) {
                     bzero(buf, MAXBUF + 1);
                     // 接收客户端的消息
                     len = recv(new_fd, buf, MAXBUF, 0);
-                    if (len > 0)
+                    if ((ssize_t)len > 0)           // 消息接收成功，且消息长度大于0
                         printf("接收消息成功:'%s'，共%d个字节的数据\n", buf, len);
-                    else {
-                        if ((ssize_t)len < 0)
-                            printf("消息接收失败！错误代码是%d，错误信息是'%s'\n", errno, strerror(errno));
-                        else
-                            printf("对方退出了，聊天终止\n");
+                    else if ((ssize_t)len < 0) {    // 消息接收失败
+                        printf("消息接收失败！错误代码是%d，错误信息是'%s'\n", errno, strerror(errno));
+                        break;
+                    } else {                        // 消息接收成功，但消息长度为0
+                        printf("对方退出了，聊天终止\n");
                         break;
                     }
                 }

@@ -54,7 +54,7 @@ int main(int argc, char **argv) {
 
     printf("\n准备就绪，可以开始聊天了……直接输入消息回车即可发信息给对方\n");
 
-    while (1) {
+    while (true) {
         // 把集合清空
         FD_ZERO(&rfds);
         // 把标准输入句柄0加入到集合中
@@ -77,29 +77,29 @@ int main(int argc, char **argv) {
         if (retval == -1) {
             printf("将退出，select出错！ %s", strerror(errno));
             break;
-        } else if (retval == 0) {
-            /* printf("没有任何消息到来，用户也没有按键，继续等待……\n"); */
+        } else if (retval == 0)   // select调用超时
             continue;
-        } else {
-            if (FD_ISSET(sockfd, &rfds)) {  // 连接的socket上有消息到来则接收对方发过来的消息并显示
+        else {
+            if (FD_ISSET(sockfd, &rfds)) {  // 若连接的socket上有消息到来，则接收对方发过来的消息并显示
                 bzero(buffer, MAXBUF + 1);
                 // 接收对方发过来的消息，最多接收 MAXBUF 个字节
                 len = recv(sockfd, buffer, MAXBUF, 0);
 
-                if (len > 0)
+                if (len > 0)    // 消息接收成功
                     printf("接收消息成功:'%s'，共%d个字节的数据\n", buffer, len);
-                else {
-                    if (len < 0)
-                        printf("消息接收失败！错误代码是%d，错误信息是'%s'\n", errno, strerror(errno));
-                    else
-                        printf("对方退出了，聊天终止！\n");
+                else if (len < 0) { // 消息接收失败，跳出循环
+                    printf("消息接收失败！错误代码是%d，错误信息是'%s'\n", errno, strerror(errno));
+                    break;
+                } else {    // 消息长度为0，跳出循环
+                    printf("对方退出了，聊天终止！\n");
                     break;
                 }
             }
 
-            if (FD_ISSET(0, &rfds)) {   // 用户按键了，则读取用户输入的内容发送出去
+            // 只有接收到消息且消息长度不为0时，才能执行到这一步
+            if (FD_ISSET(0, &rfds)) {   // 若用户按键了，则读取用户输入的内容发送出去
                 bzero(buffer, MAXBUF + 1);
-                fgets(buffer, MAXBUF, stdin);
+                fgets(buffer, MAXBUF, stdin);   // 获取用户输入的内容
                 if (!strncasecmp(buffer, "quit", 4)) {
                     printf("自己请求终止聊天！\n");
                     break;

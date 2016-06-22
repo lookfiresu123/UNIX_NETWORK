@@ -31,7 +31,7 @@ int main(int argc, char **argv) {
     int listenfd, connfd, epfd, sockfd, nfds, n, curfds;
     socklen_t len;
     struct sockaddr_in my_addr, their_addr;
-    unsigned int myport, lisnum;
+    unsigned int myport, backlog;
     char buf[MAXBUF + 1];
     // 声明epoll_event结构体的变量，ev用于注册事件，events数组用于回传要处理的事件
     struct epoll_event ev;
@@ -43,9 +43,9 @@ int main(int argc, char **argv) {
         myport = 7838;
 
     if (argv[2])
-        lisnum = atoi(argv[2]);
+        backlog = atoi(argv[2]);
     else
-        lisnum = 2;
+        backlog = 2;
 
     // 开启 socket 监听
     if ((listenfd = socket(PF_INET, SOCK_STREAM, 0)) == -1) {
@@ -71,7 +71,7 @@ int main(int argc, char **argv) {
     } else
         printf("IP 地址和端口绑定成功\n");
 
-    if (listen(listenfd, lisnum) == -1) {
+    if (listen(listenfd, backlog) == -1) {
         perror("listen");
         exit(1);
     } else
@@ -92,7 +92,7 @@ int main(int argc, char **argv) {
 
     curfds = 1;
 
-    while (1) {
+    while (true) {
         // 等待有事件发生
         nfds = epoll_wait(epfd, events, curfds, -1);
 
@@ -102,9 +102,9 @@ int main(int argc, char **argv) {
         }
 
         // 处理所有事件
-        for (n = 0; n < nfds; ++n) {
-	    // 如果新监测到一个SOCKET用户连接到了绑定的SOCKET端口，建立新的连接
-            if (events[n].data.fd == listenfd) {
+        for (n = 0; n < nfds; ++n) {    // 依次处理返回的事件
+
+            if (events[n].data.fd == listenfd) {    // 如果监测到一个新的SOCKET用户连接到了已注册的SOCKET端口，则建立新的连接
                 len = sizeof(struct sockaddr);
                 connfd = accept(listenfd, (struct sockaddr *) &their_addr, &len);
                 if (connfd < 0) {
