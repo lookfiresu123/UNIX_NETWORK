@@ -107,7 +107,7 @@ int main(int argc, char **argv) {
                 printf("没有任何消息到来，用户也没有按键，继续等待……\n");
                 continue;
             } else {
-		        // 判断当前IO是否是stdin
+                // 判断当前IO是否是stdin
                 if (FD_ISSET(0, &rfds)) {    // 用户按键了，则读取用户输入的内容发送出去
                     bzero(buf, MAXBUF + 1);
                     fgets(buf, MAXBUF, stdin);
@@ -126,7 +126,7 @@ int main(int argc, char **argv) {
                     }
                 }
 
-		        // 判断当前IO是否是来自socket
+                // 判断当前IO是否是来自socket
                 if (FD_ISSET(new_fd, &rfds)) {  // 当前连接的socket上有消息到来则接收对方发过来的消息并显示
 
                     bzero(buf, MAXBUF + 1);

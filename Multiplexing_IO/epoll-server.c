@@ -146,28 +146,28 @@ int main(int argc, char **argv) {
                 }
 
                 // 设置用于写操作的文件描述符
-		        ev.data.fd = sockfd;
+                ev.data.fd = sockfd;
                 // 设置用于注册的写操作事件
-		        ev.events = EPOLLOUT | EPOLLET;
+                ev.events = EPOLLOUT | EPOLLET;
 
                 /*修改sockfd上要处理的事件为EPOLLOUT*/
-		        epoll_ctl(epfd, EPOLL_CTL_MOD, sockfd, &ev); //修改标识符，等待下一个循环时发送数据，异步处理的精髓!!!!! ?????
+                epoll_ctl(epfd, EPOLL_CTL_MOD, sockfd, &ev); //修改标识符，等待下一个循环时发送数据，异步处理的精髓!!!!! ?????
             } else if (events[n].events & EPOLLOUT) {   // 如果有数据发送
-		        printf("EPOLLOUT\n");
-		        sockfd = events[n].data.fd;
+                printf("EPOLLOUT\n");
+                sockfd = events[n].data.fd;
 
-		        bzero(buf, MAXBUF + 1);
-		        strcpy(buf, "Server already processes!");
+                bzero(buf, MAXBUF + 1);
+                strcpy(buf, "Server already processes!");
 
-		        send(sockfd, buf, strlen(buf), 0);
+                send(sockfd, buf, strlen(buf), 0);
 
                 // 设置用于读操作的文件描述符
-		        ev.data.fd = sockfd;
+                ev.data.fd = sockfd;
                 // 设置用于注册的读操作事件
-		        ev.events = EPOLLIN | EPOLLET;
+                ev.events = EPOLLIN | EPOLLET;
 
                 // 修改sockfd上要处理的事件为EPOLIN
-		        epoll_ctl(epfd, EPOLL_CTL_MOD, sockfd, &ev);
+                epoll_ctl(epfd, EPOLL_CTL_MOD, sockfd, &ev);
 	        }
         }
     }

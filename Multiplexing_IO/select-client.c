@@ -88,7 +88,7 @@ int main(int argc, char **argv) {
 
                 if (len > 0)
                     printf("接收消息成功:'%s'，共%d个字节的数据\n", buffer, len);
-		        else {
+                else {
                     if (len < 0)
                         printf("消息接收失败！错误代码是%d，错误信息是'%s'\n", errno, strerror(errno));
                     else
