@@ -8,6 +8,7 @@
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <sys/epoll.h>
+#include <stdbool.h>
 
 #define MAXBUF 1024
 #define MAXEPOLLSIZE 10000

@@ -10,6 +10,7 @@
 #include <arpa/inet.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <stdbool.h>
 
 #define MAXBUF 1024
 

@@ -1,14 +1,22 @@
+typedef unsigned char u_char;
+typedef unsigned long u_long;
+typedef unsigned int u_int;
+typedef unsigned short u_short;
+typedef unsigned char u_char;
+
+#include <sys/types.h>
 #include <stdio.h>
 #include <string.h>
 #include <errno.h>
 #include <sys/socket.h>
-#include <resolv.h>
+//#include <resolv.h>
 #include <stdlib.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <sys/time.h>
 #include <sys/types.h>
+#include <stdbool.h>
 
 #define MAXBUF 1024
 /*********************************************************************
